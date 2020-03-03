@@ -7,7 +7,7 @@
     <parent>
         <groupId>fish.payara.samples</groupId>
         <artifactId>payara-samples</artifactId>
-        <version>5.201</version>
+        <version>5.201.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>samples-programmatic</artifactId>
