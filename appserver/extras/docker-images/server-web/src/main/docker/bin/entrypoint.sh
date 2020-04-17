@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #!/usr/bin/env bash
 set -e
 
@@ -206,3 +207,16 @@ fi
 echo "Starting instance ${PAYARA_INSTANCE_NAME}"
 ASADMIN_COMMAND="./payara5/bin/asadmin --passwordfile ${PAYARA_PASSWORD_FILE} start-local-instance --node ${PAYARA_NODE_NAME} --verbose ${PAYARA_INSTANCE_NAME}"
 ${ASADMIN_COMMAND}
+=======
+#!/bin/bash
+
+for f in ${SCRIPT_DIR}/init_* ${SCRIPT_DIR}/init.d/*; do
+      case "$f" in
+        *.sh)  echo "[Entrypoint] running $f"; . "$f" ;;
+        *)     echo "[Entrypoint] ignoring $f" ;;
+      esac
+      echo
+done
+
+exec ${SCRIPT_DIR}/startInForeground.sh $PAYARA_ARGS
+>>>>>>> 4a3fdaf3d6... Merge pull request #4628 from Pandrex247/CUSTCOM-130
