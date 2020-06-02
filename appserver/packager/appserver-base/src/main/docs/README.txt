@@ -65,19 +65,21 @@ Payara Server GitHub Project: https://github.com/payara/Payara
 Payara Community: http://www.payara.fish/community
 
 
-6. Are You Using Payara Server for Mission Critical Production Environments?
+6. Need Additional Help?
 ============
-Payara Server Enterprise is optimised for mission critical production systems in any environment: on premise, in the cloud, or hybrid. Payara Server is aggressively compatible with the ecosystem components you're already using, provides broad integration with cloud vendors, and support for Docker and Kubernetes. Development
-in collaboration with an industry-leading DevOps team and the global Payara community ensures Payara Server Enterprise is the best option for production Jakarta EE applications today and for the future.
+As a Payara Platform Enterprise customer, you have exclusive access to our add-on consultancy services through Payara Accelerator. Expert consultants customise solutions to meet your  needs with on-premise or remote consultancy offerings.
 
-Payara Server Enterprise subscriptions include:
+Accelerate your Payara Platform deployment, migration, or business growth through:
 
-* Choice of support: Migration & Project Support, 24x7, or 10x5 plans
-* Monthly releases, bug fixes, and patches
-* 10-year software lifecycle
-* Access to add-on Payara Accelerator consultancy services
+* Migration assistance
+* Application server upgrades
+* Health checks
+* Configuration reviews
+* Monitoring
+* Performance tuning
+* Troubleshooting
 
-Learn more about Payara Server Enterprise: https://www.payara.fish/support/
+Learn more about Payara Accelerator: https://www.payara.fish/support/consultancy/
 
 
 7. Follow us
