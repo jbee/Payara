@@ -61,6 +61,7 @@
         <module>javaee</module>
         <module>appserv-rt</module>
         <module>payara-micro</module>
+        <module>certificate-management</module>
     </modules>
 
     <profiles>
@@ -88,7 +89,6 @@
             </activation>
             <modules>
                 <module>embedded</module>
-                <module>certificate-management</module>
             </modules>
         </profile>
         <!-- Profile to build Docker Images-->
