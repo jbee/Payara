@@ -40,7 +40,6 @@
 
 package fish.payara.microprofile.metrics.rest;
 
-
 import fish.payara.microprofile.metrics.MetricsService;
 import fish.payara.microprofile.metrics.exception.NoSuchMetricException;
 import fish.payara.microprofile.metrics.exception.NoSuchRegistryException;
@@ -145,11 +144,11 @@ public class MetricsResource extends HttpServlet {
         if (GET.equalsIgnoreCase(method)) {
             if (APPLICATION_JSON.equals(contentType)) {
                 return new MetricsWriterImpl(new JsonExporter(writer, Mode.GET, true),
-                    service::getAllRegistryNames, service::getRegistry);
+                        service::getAllRegistryNames, service::getRegistry);
             }
             if (TEXT_PLAIN.equals(contentType)) {
                 return new MetricsWriterImpl(new OpenMetricsExporter(writer),
-                    service::getAllRegistryNames, service::getRegistry);
+                        service::getAllRegistryNames, service::getRegistry);
             }
         }
         if (OPTIONS.equalsIgnoreCase(method)) {
@@ -168,24 +167,24 @@ public class MetricsResource extends HttpServlet {
             accept = TEXT_PLAIN;
         }
         switch (method) {
-        case GET:
-            Optional<String> selectedFormat = parseMetricsAcceptHeader(accept);
+            case GET:
+                Optional<String> selectedFormat = parseMetricsAcceptHeader(accept);
 
-            if (selectedFormat.isPresent()) {
-                return selectedFormat.get();
-            }
+                if (selectedFormat.isPresent()) {
+                    return selectedFormat.get();
+                }
 
-            response.sendError(SC_NOT_ACCEPTABLE, String.format("[%s] not acceptable", accept));
-            return null;
+                response.sendError(SC_NOT_ACCEPTABLE, String.format("[%s] not acceptable", accept));
+                return null;
 
-        case OPTIONS:
-            if (accept.contains(APPLICATION_JSON) || accept.contains(APPLICATION_WILDCARD)) {
-                return APPLICATION_JSON;
-            }
-            response.sendError(SC_NOT_ACCEPTABLE, String.format("[%s] not acceptable", accept));
-            return null;
-        default:
-            response.sendError(SC_METHOD_NOT_ALLOWED, String.format("HTTP method [%s] not allowed", method));
+            case OPTIONS:
+                if (accept.contains(APPLICATION_JSON) || accept.contains(APPLICATION_WILDCARD)) {
+                    return APPLICATION_JSON;
+                }
+                response.sendError(SC_NOT_ACCEPTABLE, String.format("[%s] not acceptable", accept));
+                return null;
+            default:
+                response.sendError(SC_METHOD_NOT_ALLOWED, String.format("HTTP method [%s] not allowed", method));
         }
 
         return null;
