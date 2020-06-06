@@ -25,10 +25,10 @@ RUN true \
     && true
 
 USER payara
-WORKDIR ${PAYARA_HOME}
+WORKDIR ${HOME_DIR}
 
-COPY maven/artifacts/payara-micro.jar .
+COPY --chown=payara:payara maven/bin/* ${SCRIPT_DIR}/
+COPY --chown=payara:payara maven/artifacts/payara-micro.jar .
 
-# Default command to run
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=90.0", "-jar", "payara-micro.jar"]
-CMD ["--deploymentDir", "/opt/payara/deployments"]
+ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+CMD ["--deploymentDir","/opt/payara/deployments"]

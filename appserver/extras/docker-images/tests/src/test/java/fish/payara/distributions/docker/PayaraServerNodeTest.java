@@ -1,7 +1,7 @@
 /*
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- *  Copyright (c) 2020 Payara Foundation and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  *
  *  The contents of this file are subject to the terms of either the GNU
  *  General Public License Version 2 only ("GPL") or the Common Development
@@ -46,12 +46,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.SSLHandshakeException;
-
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -63,50 +64,56 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author David Matejcek
  */
 @Testcontainers
-public class PayaraServerWebTest {
+public class PayaraServerNodeTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PayaraServerWebTest.class);
+    private static final int DAS_ADMIN_PORT = 4848;
+    private static final int NODE_HTTP_PORT = 28080;
+
+    private static final Logger DASLOG = LoggerFactory.getLogger("DAS");
+    private static final Logger NODELOG = LoggerFactory.getLogger("NODE");
 
     @Container
-    private static final PayaraContainer CONTAINER = new PayaraContainer("payara/server-web") //
+    private static final PayaraContainer DAS = new PayaraContainer("payara/server-full") //
             .withExposedPorts(4848, 8080);
 
+    @Container
+    private final PayaraContainer node = new PayaraContainer("payara/server-node").withExposedPorts(NODE_HTTP_PORT) //
+            .withEnv("PAYARA_DAS_HOST", "host.testcontainers.internal")
+            .withEnv("PAYARA_DAS_PORT", Integer.toString(DAS.getMappedPort(DAS_ADMIN_PORT)))
+            .withEnv("DOCKER_CONTAINER_IP", "host.testcontainers.internal") //
+            .withStartupTimeout(Duration.ofSeconds(30));
 
     @BeforeAll
-    public static void initLogging() {
-        CONTAINER.followOutput(new Slf4jLogConsumer(LOG));
+    public static void initDAS() throws Exception {
+        DAS.followOutput(new Slf4jLogConsumer(DASLOG));
+        org.testcontainers.Testcontainers.exposeHostPorts(DAS.getMappedPort(4848));
+    }
+
+
+    @BeforeEach
+    public void initNODE() {
+        node.followOutput(new Slf4jLogConsumer(NODELOG));
     }
 
 
     @Test
+    @Timeout(value = 30)
     public void testStartedServerEndpoints() throws Exception {
-        assertTrue(CONTAINER.isRunning(), "server is running");
+        assertTrue(node.isRunning(), "server is running");
         assertAll( //
-                () -> assertNotNull(CONTAINER.getMappedPort(4848), "admin port"), //
-                () -> assertNotNull(CONTAINER.getMappedPort(8080), "http port") //
+                () -> assertNotNull(DAS.getMappedPort(4848), "DAS: admin port"), //
+                () -> assertNotNull(node.getMappedPort(28080), "NODE: http port") //
         );
-        final URL welcomePageUrl = CONTAINER.getHttpUrl(8080);
+        final URL welcomePageUrl = node.getHttpUrl(28080);
         assertNotNull(welcomePageUrl, "welcome page url");
         final String welcomePage = getPageContent(welcomePageUrl);
-        assertThat("welcome page", welcomePage, containsString("Hello from Payara - your server is now running!"));
-
-        final URL adminPageUrl = CONTAINER.getHttpsUrl(4848);
-        assertNotNull(adminPageUrl, "admin page url");
-        try {
-            getPageContent(adminPageUrl);
-            fail("The certificate was accepted despite it is not trusted!");
-        } catch (final SSLHandshakeException e) {
-            // note: the message may be localized or changed, update it appropriately (or find
-            // another suitable check)
-            assertThat("e.message", e.getMessage(),
-                    containsString("unable to find valid certification path to requested target"));
-        }
+        assertThat("welcome page of the node", welcomePage,
+                containsString("Hello from Payara - your server is now running!"));
     }
 
 

@@ -6,12 +6,12 @@
         <artifactId>docker-images</artifactId>
         <version>5.20.0-SNAPSHOT</version>
     </parent>
-    <artifactId>server-web-docker-image</artifactId>
+    <artifactId>server-full-docker-image</artifactId>
     <packaging>pom</packaging>
-    <name>Payara Docker Images - Server Web</name>
+    <name>Payara Docker Images - Server Full</name>
 
     <properties>
-        <docker.payara.repository>payara/server-web</docker.payara.repository>
+        <docker.payara.repository>payara/server-full</docker.payara.repository>
     </properties>
 
     <dependencies>
@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>fish.payara.distributions</groupId>
-            <artifactId>payara-web</artifactId>
+            <artifactId>payara</artifactId>
             <type>zip</type>
             <scope>provided</scope>
         </dependency>
