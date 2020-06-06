@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2019-2020 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,44 +37,18 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.microprofile.faulttolerance.policy;
-
-import java.lang.reflect.Method;
-import java.util.concurrent.CompletionStage;
+package fish.payara.microprofile.faulttolerance.service;
 
 import javax.interceptor.InvocationContext;
 
-import org.eclipse.microprofile.faulttolerance.Bulkhead;
-
-import fish.payara.microprofile.faulttolerance.FaultToleranceConfig;
+import fish.payara.notification.requesttracing.RequestTraceSpan;
 
 /**
- * The resolved "cached" information of a {@link Bulkhead} annotation an a specific method.
- * 
- * @author Jan Bernitt
+ * A abstraction to decouple FT implementation from request tracing implementation as far as possible.
  */
-public final class BulkheadPolicy extends Policy {
+public interface FaultToleranceRequestTracing {
 
-    public final int value;
-    public final int waitingTaskQueue;
-    public final boolean exitOnCompletion;
+    void startSpan(RequestTraceSpan span, InvocationContext context);
 
-    public BulkheadPolicy(Method annotatedMethod, int value, int waitingTaskQueue) {
-        checkAtLeast(1, annotatedMethod, Bulkhead.class, "value", value);
-        checkAtLeast(0, annotatedMethod, Bulkhead.class, "waitingTaskQueue", waitingTaskQueue);
-        this.value = value;
-        this.waitingTaskQueue = waitingTaskQueue;
-        this.exitOnCompletion = annotatedMethod.getReturnType() == CompletionStage.class;
-    }
-
-    public static BulkheadPolicy create(InvocationContext context, FaultToleranceConfig config) {
-        if (config.isAnnotationPresent(Bulkhead.class) && config.isEnabled(Bulkhead.class)) {
-            Bulkhead annotation = config.getAnnotation(Bulkhead.class);
-            return new BulkheadPolicy(context.getMethod(),
-                    config.value(annotation), 
-                    config.waitingTaskQueue(annotation));
-        }
-        return null;
-    }
-
+    void endSpan();
 }
