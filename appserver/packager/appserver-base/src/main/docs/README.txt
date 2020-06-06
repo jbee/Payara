@@ -65,17 +65,24 @@ Payara Server GitHub Project: https://github.com/payara/Payara
 Payara Community: http://www.payara.fish/community
 
 
-6. Need support?
+6. Need Additional Help?
 ============
+As a Payara Platform Enterprise customer, you have exclusive access to our add-on consultancy services through Payara Accelerator. Expert consultants customise solutions to meet your  needs with on-premise or remote consultancy offerings.
 
-Migrating to Payara Server or Payara Micro? Our Migration & Project Support is offered through a flat fee per year regardless of the size of your environment and supports an unlimited number of units in development.
+Accelerate your Payara Platform deployment, migration, or business growth through:
 
-Need help with the Payara Platform in production? Payara Enterprise offers software, security, stability, and support directly from Engineers.
+* Migration assistance
+* Application server upgrades
+* Health checks
+* Configuration reviews
+* Monitoring
+* Performance tuning
+* Troubleshooting
 
-Learn more about Payara support options: https://www.payara.fish/support/
+Learn more about Payara Accelerator: https://www.payara.fish/support/consultancy/
 
 
 7. Follow us
 ============
 
-Make sure to follow @Payara_Fish on Twitter and read The Payara Blog (http://blog.payara.fish/) to get the latest news on Payara.
+Make sure to follow @Payara_Fish on Twitter and read The Payara Tech Blog (http://blog.payara.fish/) to get the latest news on Payara.
