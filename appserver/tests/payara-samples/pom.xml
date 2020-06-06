@@ -28,6 +28,9 @@
         <payara.domain.name>domain1</payara.domain.name>
 
         <micro.isActive>false</micro.isActive>
+
+        <!-- Exclude unstable tests by default-->
+        <excludedGroups>fish.payara.samples.Unstable</excludedGroups>
     </properties>
 
     <modules>
