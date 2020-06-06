@@ -52,7 +52,7 @@
     <name>Payara Micro Distribution</name>
 
     <properties>
-        <product.name>Payara Micro</product.name>
+        <product.name>Payara Micro Enterprise</product.name>
     </properties>
 
     <build>
@@ -507,12 +507,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>enterprise</id>
-            <properties>
-                <product.name>Payara Micro Enterprise</product.name>
-            </properties>
         </profile>
     </profiles>
 </project>
