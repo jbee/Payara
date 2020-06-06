@@ -37,6 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+// Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 
 // Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 
@@ -278,6 +279,7 @@ public class RestApiHandlers {
             return;
         }
 
+        parseResponse(response, handlerCtx, endpoint, attrs, false, true);
         handlerCtx.setOutputValue("result", endpoint);
     }
 
