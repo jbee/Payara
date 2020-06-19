@@ -74,6 +74,14 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
     @Param(name = "listener", optional = true)
     protected String listener;
 
+    // For passing to AbstractCertManagementLocalInstanceCommand - see LocalInstanceCommand
+    @Param(name = "nodedir", optional = true, alias = "agentdir")
+    protected String nodeDir0;
+
+    // For passing to AbstractCertManagementLocalInstanceCommand - see LocalInstanceCommand
+    @Param(name = "node", optional = true, alias = "nodeagent")
+    protected String node0;
+
     @Param(name = "target", optional = true, defaultValue = SystemPropertyConstants.DAS_SERVER_NAME)
     protected String target;
 
@@ -345,8 +353,16 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
 
         @Override
         protected void validate() throws CommandException {
-            if (ok(target))
+            if (ok(target)) {
                 instanceName = target;
+            }
+            if (ok(nodeDir0)) {
+                nodeDir = nodeDir0;
+            }
+            if (ok(node0)) {
+                node = node0;
+            }
+
             super.validate();
         }
 
