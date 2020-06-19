@@ -7,7 +7,7 @@ NAME
 
 SYNOPSIS
            generate-self-signed-certificate [--help]
-           [--domain_name domain-name] [--domaindir domain-dir]
+           [--domainname domain-name] [--domaindir domain-dir]
            [--node node-name] [--nodedir node-dir]
            [--target instance-name] [--listener listener-name]
            [alternativenames (type:value)[;type:value]*]
@@ -26,11 +26,15 @@ DESCRIPTION
        default key and trust store of the DAS), since any certificates added
        to the instance stores would be lost upon next synchronisation.
 
+       If the instance or listener is not configured to use the default stores
+       then the certificate must be added manually with the add-to-keystore
+       and add-to-truststore commands.
+
 OPTIONS
        --help, -?
            Displays the help text for the subcommand.
 
-       --domain_name
+       --domainname, --domain_name
            The unique name of the domain to add the certificate to. This operand
            is optional, defaulting to domain1 if not provided.
 
