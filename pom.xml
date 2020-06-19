@@ -58,9 +58,9 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:payara/payara.git</connection>
-        <url>scm:git:git@github.com:payara/payara.git</url>
-        <developerConnection>scm:git:git@github.com:payara/payara.git</developerConnection>
+        <connection>scm:git:git@github.com:payara/payara-enterprise.git</connection>
+        <url>scm:git:git@github.com:payara/payara-enterprise.git</url>
+        <developerConnection>scm:git:git@github.com:payara/payara-enterprise.git</developerConnection>
         <tag>payara-server-5.20.1-SNAPSHOT</tag>
     </scm>
 
