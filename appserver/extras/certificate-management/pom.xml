@@ -88,8 +88,7 @@
         <dependency>
             <groupId>fish.payara.server.internal.core</groupId>
             <artifactId>kernel</artifactId>
-            <version>5.202-SNAPSHOT</version>
-            <type>jar</type>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

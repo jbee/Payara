@@ -1,6 +1,6 @@
 <!--- Title your PR with a Jira reference (if available) followed by brief description - for example: "PAYARA-1234 Add readme file" -->
 
-# Description
+## Description
 This is a bug fix / feature. <!-- delete/modify as applicable-->
 
 <!-- fixes GitHub issue? - provide a link to that issue here -->
@@ -9,7 +9,7 @@ This is a bug fix / feature. <!-- delete/modify as applicable-->
 
 <!--- Please provide enough information here about the what and why of your change. Target for developers of any experience level to understand -->
 
-# Important Info
+## Important Info
 
 ### Dependant PRs <!-- delete as applicable -->
 <!--- Link any related or dependant PRs here with brief description why -->
@@ -17,7 +17,7 @@ This is a bug fix / feature. <!-- delete/modify as applicable-->
 ### Blockers <!-- delete as applicable -->
 <!-- Detail any blockers with links/info -->
 
-# Testing
+## Testing
 
 ### New tests
 <!-- Link to the test suite PR or provide info -->
@@ -40,9 +40,9 @@ This is a bug fix / feature. <!-- delete/modify as applicable-->
 ### Testing Environment
 <!--- Which OS, JDK, Maven version did you use? - for example "Zulu JDK 1.8_212 on Ubuntu 18.04 with Maven 3.6.0"-->
 
-# Documentation
+## Documentation
 <!-- Link to the documentation PR where applicable -->
 
-# Notes for Reviewers
+## Notes for Reviewers
 <!-- Please give notes for any reviewers. The code should explain itself, but where should they start? Do you want feedback on anything specific? -->
 <!-- Have you tagged any appropriate reviewers?-->
