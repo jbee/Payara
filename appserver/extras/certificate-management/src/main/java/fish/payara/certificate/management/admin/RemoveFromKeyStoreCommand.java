@@ -66,7 +66,7 @@ public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
 
     @Param(name = "alias", primary = true)
     private String alias;
-
+    
     @Override
     protected void validate() throws CommandException {
         userArgAlias = alias;
@@ -85,7 +85,7 @@ public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
 
         parseKeyStore();
         removeFromKeyStore();
-
+            
         return CLIConstants.SUCCESS;
     }
 
@@ -95,6 +95,7 @@ public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
             super(programOpts, env);
         }
 
+        @Override
         protected int executeCommand() throws CommandException {
             parseKeyStore();
 
@@ -113,6 +114,9 @@ public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
             }
 
             removeFromKeyStore();
+            if (reload) {
+                restartHttpListeners();
+            }
 
             return CLIConstants.SUCCESS;
         }

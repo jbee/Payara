@@ -42,6 +42,7 @@ package fish.payara.certificate.management.admin;
 import com.sun.enterprise.admin.cli.Environment;
 import com.sun.enterprise.admin.cli.ProgramOptions;
 import com.sun.enterprise.admin.cli.cluster.SynchronizeInstanceCommand;
+import com.sun.enterprise.admin.cli.remote.RemoteCLICommand;
 import com.sun.enterprise.admin.servermgmt.KeystoreManager;
 import com.sun.enterprise.admin.servermgmt.RepositoryException;
 import com.sun.enterprise.admin.servermgmt.cli.LocalDomainCommand;
@@ -56,15 +57,23 @@ import org.glassfish.config.support.TranslatedConfigView;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+import org.glassfish.api.admin.ServerEnvironment;
+import org.glassfish.embeddable.CommandResult;
+import org.glassfish.embeddable.CommandRunner;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.internal.api.Target;
 
 /**
  * Parent class from which other certificate management commands can extend. Contains the common methods and params.
@@ -76,9 +85,19 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
 
     @Param(name = "listener", optional = true)
     protected String listener;
+    
+    @Param(name="reload", optional=true)
+    protected boolean reload;
 
     @Param(name = "target", optional = true, defaultValue = SystemPropertyConstants.DAS_SERVER_NAME)
     protected String target;
+    
+    @Inject
+    ServerEnvironment serverEnvironment;
+    
+    @Inject
+    private ServiceLocator habitat;
+    
 
     protected String userArgAlias;
 
@@ -342,6 +361,16 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
             out.flush();
         }
     }
+    
+    protected void restartHttpListeners() throws CommandException {
+        try {
+            RemoteCLICommand restartListenersCommand = new RemoteCLICommand("restart-http-listeners", programOpts, env);
+            restartListenersCommand.execute();
+        } catch (CommandException ex) {
+            //This will occur if the domain isn't running
+            logger.log(Level.FINE, "HTTP Listeners could not be restarted", ex);
+        }
+    }
 
     /**
      * Parent class for the local instance version of certificate management commands to inherit from.
@@ -472,7 +501,16 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
 
             return defaultTruststore;
         }
-
+        
+        protected void restartHttpListeners() {
+            try {
+                RemoteCLICommand restartListenersCommand = new RemoteCLICommand("restart-http-listeners", programOpts, env);
+                restartListenersCommand.execute();
+            } catch (CommandException ex) {
+                //This will occur if the instance isn't running
+                logger.log(Level.FINE, "HTTP Listeners could not be restarted", ex);
+            }
+        }
 
     }
 }

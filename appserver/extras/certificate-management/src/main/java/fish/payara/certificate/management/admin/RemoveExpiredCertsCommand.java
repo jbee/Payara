@@ -101,6 +101,10 @@ public class RemoveExpiredCertsCommand extends AbstractCertManagementCommand {
             store.load(new FileInputStream(truststore), truststorePassword);
             filterExpiredKeys(store);
             save(store);
+            
+            if (reload) {
+                restartHttpListeners();
+            }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
             ex.printStackTrace();
             throw new CommandException(ex);
@@ -207,6 +211,9 @@ public class RemoveExpiredCertsCommand extends AbstractCertManagementCommand {
                 store.load(new FileInputStream(truststore), truststorePassword);
                 filterExpiredKeys(store);
                 save(store);
+                if (reload) {
+                    restartHttpListeners();
+                }
             } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
                 ex.printStackTrace();
                 throw new CommandException(ex);

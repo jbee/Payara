@@ -113,6 +113,9 @@ public class RemoveFromTrustStoreCommand extends AbstractCertManagementCommand {
             }
 
             removeFromTrustStore();
+            if (reload) {
+                restartHttpListeners();
+            }
 
             return CLIConstants.SUCCESS;
         }

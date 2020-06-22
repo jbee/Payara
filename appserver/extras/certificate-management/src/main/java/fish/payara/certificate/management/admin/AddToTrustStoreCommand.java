@@ -98,6 +98,7 @@ public class AddToTrustStoreCommand extends AbstractCertManagementCommand {
             super(programOpts, env);
         }
 
+        @Override
         protected int executeCommand() throws CommandException {
             parseTrustStore();
 
@@ -116,6 +117,9 @@ public class AddToTrustStoreCommand extends AbstractCertManagementCommand {
             }
 
             addToTrustStore(file);
+            if (reload) {
+                restartHttpListeners();
+            }
 
             return CLIConstants.SUCCESS;
         }
