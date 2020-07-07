@@ -59,20 +59,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.Collection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.glassfish.api.admin.ServerEnvironment;
-import org.glassfish.embeddable.CommandResult;
-import org.glassfish.embeddable.CommandRunner;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.internal.api.Target;
 
 /**
  * Parent class from which other certificate management commands can extend. Contains the common methods and params.
@@ -84,9 +78,6 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
 
     @Param(name = "listener", optional = true)
     protected String listener;
-    
-    @Param(name="reload", optional=true)
-    protected boolean reload;
 
     // For passing to AbstractCertManagementLocalInstanceCommand - see LocalInstanceCommand
     @Param(name = "nodedir", optional = true, alias = "agentdir")
@@ -98,12 +89,6 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
 
     @Param(name = "target", optional = true, defaultValue = SystemPropertyConstants.DAS_SERVER_NAME)
     protected String target;
-    
-    @Inject
-    ServerEnvironment serverEnvironment;
-    
-    @Inject
-    private ServiceLocator habitat;
     
 
     protected String userArgAlias;
@@ -358,7 +343,7 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
         }
     }
     
-    protected void restartHttpListeners() throws CommandException {
+    protected void restartHttpListeners() {
         try {
             RemoteCLICommand restartListenersCommand = new RemoteCLICommand("restart-http-listeners", programOpts, env);
             restartListenersCommand.execute();
@@ -507,16 +492,6 @@ public abstract class AbstractCertManagementCommand extends LocalDomainCommand {
                             .replace("${com.sun.aas.instanceRoot}", instanceDir.getAbsolutePath()));
 
             return defaultTruststore;
-        }
-        
-        protected void restartHttpListeners() {
-            try {
-                RemoteCLICommand restartListenersCommand = new RemoteCLICommand("restart-http-listeners", programOpts, env);
-                restartListenersCommand.execute();
-            } catch (CommandException ex) {
-                //This will occur if the instance isn't running
-                logger.log(Level.FINE, "HTTP Listeners could not be restarted", ex);
-            }
         }
 
     }

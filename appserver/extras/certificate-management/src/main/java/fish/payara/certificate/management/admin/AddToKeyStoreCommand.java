@@ -66,6 +66,9 @@ public class AddToKeyStoreCommand extends AbstractCertManagementCommand {
 
     @Param(name = "file")
     private File file;
+    
+    @Param(name="reload", optional=true)
+    private boolean reload;
 
     @Param(name = "alias", primary = true)
     private String alias;

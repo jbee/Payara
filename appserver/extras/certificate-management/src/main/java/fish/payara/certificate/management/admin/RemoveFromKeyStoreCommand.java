@@ -61,9 +61,11 @@ import java.util.logging.Logger;
 @PerLookup
 public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
 
-
     private static final Logger logger = Logger.getLogger(CLICommand.class.getPackage().getName());
 
+    @Param(name="reload", optional=true)
+    private boolean reload;
+    
     @Param(name = "alias", primary = true)
     private String alias;
     
