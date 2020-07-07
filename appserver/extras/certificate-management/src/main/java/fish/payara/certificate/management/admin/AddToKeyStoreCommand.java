@@ -93,7 +93,7 @@ public class AddToKeyStoreCommand extends AbstractCertManagementCommand {
         parseKeyStore();
         addToKeyStore(file);
         
-        if (file.getName().endsWith(".crt")) {
+        if (file.getName().matches(".*\\.(cer|cert|crt|pem)")) {
             try (FileReader fileReader = new FileReader(file)) {
                 try (BufferedReader reader = new BufferedReader(fileReader)) {
                     boolean includesPrivateKey = reader.lines().anyMatch((t) -> {
