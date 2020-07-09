@@ -1,0 +1,112 @@
+set-network-protocol-security-configuration(1)        asadmin Utility Subcommands       set-network-protocol-security-configuration(1)
+
+NAME
+       set-network-protocol-security-configuration - sets the security configuration for a protocol
+
+SYNOPSIS
+           set-network-protocol-security-configuration [--help]
+           [--enabled={false|true}] [--dynamic={false|true}]
+           [--tls1-enabled={false|true}] [--tls11-enabled={false|true}]
+           [--tls12-enabled={false|true}] [--tls13-enabled={false|true}]
+           [--keystore keystore] [--keystore-password password]
+           [--truststore trustsore] -[--tuststore-password password]
+           [--session-cache-size session-cache-size] [--session-timeout session-timeout]
+           [--certificate-nickname cert-name] [--client-auth={need|want|}]
+           [--target target]
+           protocol-name
+
+DESCRIPTION
+       The set-network-protocol-security-configuration subcommand sets the details of the security
+       configuration of a given protocol. When multiple TLS versions are allowed, Payara Server will
+       attempt to use the most secure available, falling back to a less secure version if the client
+       does not support it.
+
+OPTIONS
+       --help, -?
+           Displays the help text for the subcommand.
+
+       --enabled
+           If set to true, the protocol runs SSL/TLS.
+
+       --tls1-enabled
+           If set to true, TLS version 1 is allowed to be used when making a connection.
+
+       --tls11-enabled
+           If set to true, TLS version 1.1 is allowed to be used when making a connection.
+
+       --tls12-enabled
+           If set to true, TLS version 1.2 is allowed to be used when making a connection.
+
+       --tls13-enabled
+           If set to true, TLS version 1.3 is allowed to be used when making a connection.
+
+       --keystore
+           Name of the keystore file i.e. keystore.jks
+
+       --keystore-password
+           Password for the keystore file
+
+       --truststore
+           Name of the truststore file i.e cacerts.jks
+
+       --truststore-password
+           Password for the truststore file
+
+       --trust-algorithm
+           Name of the trust management algorithm (for example, PKIX) to use for certification path validation
+
+       --session-timeout
+           How long before TLS session expire from the cache.
+
+       --session-cache-size
+           How large the TLS session cache can get
+
+       --certificate-nickname
+           Takes a single value, identifies the server's default keypair and certificate.
+
+       --client-auth
+           Determines if if the engine will request (want) or require (need) client authentication
+           Valid values:  want, need, or left blank
+
+       --target
+           Creates the protocol only on the specified target. Valid values are
+           as follows:
+
+           server
+               Creates the protocol on the default server instance. This is
+               the default value.
+
+           configuration-name
+               Creates the protocol in the specified configuration.
+
+           cluster-name
+               Creates the protocol on all server instances in the specified
+               cluster.
+
+           standalone-instance-name
+               Creates the protocol on the specified standalone server
+               instance.
+
+OPERANDS
+       protocol-name
+           The name of the protocol.
+
+EXAMPLES
+       Example 1, Set security to be enabled with TLS 1.3 only on http-listener-2
+
+               asadmin> set-network-protocol-security-configuration --enabled=true --tls1-enabled=false
+                --tls11-enabled false --tls12-enabled false --tls13-enabled true http-listener-2
+
+EXIT STATUS
+       0
+           command executed successfully
+
+       1
+           error in executing the command
+
+SEE ALSO
+       delete-protocol(1), list-protocols(1), create-network-listener(1), create-protocol
+
+       asadmin(1M)
+
+Jakarta EE 8                         8 Jul 2020              set-network-protocol-security-configuration(1)

@@ -322,4 +322,9 @@ public class LogFacade {
             message="UnprocessedChangeEvent: {0} port changed from {1} to {2}",
             level = "INFO")
     public static final String ADMIN_PORT_CHANGED = prefix + "00051";
+    
+    @LogMessageInfo(
+            message="Failed to change the security configuration for HTTP protocol {0}",
+            level = "Severe")
+    public static final String FAILED_CHANGE_SECURITY_PROTOCOL = prefix + "00052";
 }
