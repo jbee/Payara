@@ -41,15 +41,17 @@ package fish.payara.grizzly.config.admin.cli;
 
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import com.sun.enterprise.config.serverbeans.Config;
-import com.sun.enterprise.util.SystemPropertyConstants;
-import com.sun.enterprise.v3.services.impl.GrizzlyService;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
+
+import com.sun.enterprise.config.serverbeans.Config;
+import com.sun.enterprise.util.SystemPropertyConstants;
+import com.sun.enterprise.v3.services.impl.GrizzlyService;
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommand;
@@ -152,14 +154,11 @@ public class SetNetworkProtocolSecurityConfiguration implements AdminCommand {
         Protocol protocol = config.getNetworkConfig().getProtocols().findProtocol(protocolName);
         
         try {
-            ConfigSupport.apply(new SingleConfigCode<Protocol>() {
-                @Override
-                public Object run(Protocol param) throws PropertyVetoException, TransactionFailure {
-                   if (enabled != null) {
-                        protocol.setSecurityEnabled(enabled.toString());
-                    }
-                   return null;
+            ConfigSupport.apply((Protocol param) -> {
+                if (enabled != null) {
+                    param.setSecurityEnabled(enabled.toString());
                 }
+                return null;
             }, protocol);
         } catch (TransactionFailure ex) {
             LOGGER.log(Level.SEVERE, null, ex);
