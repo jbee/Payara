@@ -92,6 +92,10 @@ public class AddToKeyStoreCommand extends AbstractCertManagementCommand {
         parseKeyStore();
         addToKeyStore(file);
 
+        if (reload) {
+            restartHttpListeners();
+        }
+
         return CLIConstants.SUCCESS;
     }
 

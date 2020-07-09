@@ -88,6 +88,10 @@ public class RemoveFromKeyStoreCommand extends AbstractCertManagementCommand {
         parseKeyStore();
         removeFromKeyStore();
             
+        if (reload) {
+            restartHttpListeners();
+        }
+        
         return CLIConstants.SUCCESS;
     }
 

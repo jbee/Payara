@@ -89,6 +89,10 @@ public class RemoveFromTrustStoreCommand extends AbstractCertManagementCommand {
         parseTrustStore();
         removeFromTrustStore();
 
+        if (reload) {
+            restartHttpListeners();
+        }
+        
         return CLIConstants.SUCCESS;
     }
 
@@ -98,6 +102,7 @@ public class RemoveFromTrustStoreCommand extends AbstractCertManagementCommand {
             super(programOpts, env);
         }
 
+        @Override
         protected int executeCommand() throws CommandException {
             parseTrustStore();
 

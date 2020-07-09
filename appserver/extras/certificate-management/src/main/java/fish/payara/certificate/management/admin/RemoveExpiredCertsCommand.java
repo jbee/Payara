@@ -217,6 +217,9 @@ public class RemoveExpiredCertsCommand extends AbstractCertManagementCommand {
                 throw new CommandException(ex);
             }
 
+            if (reload) {
+                restartHttpListeners();
+            }
             return CLIConstants.SUCCESS;
         }
 

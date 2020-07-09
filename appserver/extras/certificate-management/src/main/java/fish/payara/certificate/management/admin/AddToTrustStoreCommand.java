@@ -92,6 +92,10 @@ public class AddToTrustStoreCommand extends AbstractCertManagementCommand {
         parseTrustStore();
         addToTrustStore(file);
 
+        if (reload) {
+            restartHttpListeners();
+        }
+        
         return CLIConstants.SUCCESS;
     }
 
