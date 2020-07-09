@@ -100,7 +100,7 @@ public class AddToKeyStoreCommand extends AbstractCertManagementCommand {
                         return t.contains("-----BEGIN RSA PRIVATE KEY-----");
                     });
                     if (!includesPrivateKey) {
-                        logger.warning("This certificate cannot be used by the HTTP listener as is does not contain the private key");
+                        logger.warning("This certificate cannot be used by a HTTP listener as it does not contain a private key");
                         return CLIConstants.WARNING;
                     }
                     
