@@ -40,8 +40,11 @@
 package fish.payara.certificate.management.admin;
 
 import com.sun.enterprise.admin.cli.CLICommand;
+import com.sun.enterprise.admin.cli.Environment;
+import com.sun.enterprise.admin.cli.ProgramOptions;
 import com.sun.enterprise.admin.servermgmt.KeystoreManager;
 import com.sun.enterprise.admin.servermgmt.RepositoryException;
+import com.sun.enterprise.util.SystemPropertyConstants;
 import fish.payara.certificate.management.CertificateManagementKeytoolCommands;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,16 +59,16 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.glassfish.api.Param;
 import org.glassfish.api.admin.CommandException;
 import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
 
 /**
- * Replaces all self-signed certificates with new ones
- * that have the same alias and dname.
- * 
- * These new certificates WILL have different fringerprints to
- * the old ones.
+ * Replaces all self-signed certificates with new ones that have the same alias and dname.
+ *
+ * These new certificates WILL have different fingerprints to the old ones.
+ *
  * @author jonathan coustick
  * @since 5.21.0
  */
@@ -75,10 +78,22 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
 
     private static final Logger LOGGER = Logger.getLogger(CLICommand.class.getPackage().getName());
 
+    @Param(name = "reload", optional = true)
+    private boolean reload;
+
     private KeyStore store;
 
     @Override
     protected int executeCommand() throws CommandException {
+        // If we're targetting an instance that isn't the DAS, use a different command
+        if (target != null && !target.equals(SystemPropertyConstants.DAS_SERVER_NAME)) {
+            RenewSelfSignedCertificateLocalInstanceCommand localInstanceCommand =
+                    new RenewSelfSignedCertificateLocalInstanceCommand(programOpts, env);
+            localInstanceCommand.validate();
+            return localInstanceCommand.executeCommand();
+        }
+        
+        
         parseKeyAndTrustStores();
 
         try {
@@ -100,11 +115,15 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
                 removeFromTrustStore(); //Remove old entry from truststore
                 addToKeystore(dname, alias, keystore); //create new entry
                 addToTruststore(alias); //Add new entry to truststore
-                
+
             } catch (KeyStoreException | CommandException ex) {
                 LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
                 return ERROR;
             }
+        }
+
+        if (reload) {
+            restartHttpListeners();
         }
 
         return SUCCESS;
@@ -126,7 +145,7 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
         }
         return selfSignedCerts;
     }
-    
+
     private void addToKeystore(String dname, String alias, File keyStore) throws CommandException {
         // Run keytool command to generate self-signed cert
         KeystoreManager.KeytoolExecutor keytoolExecutor = new KeystoreManager.KeytoolExecutor(
@@ -153,5 +172,49 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
             throw new CommandException(re);
         }
     }
-  
+
+    private class RenewSelfSignedCertificateLocalInstanceCommand extends AbstractLocalInstanceCertManagementCommand {
+
+        public RenewSelfSignedCertificateLocalInstanceCommand(ProgramOptions programOpts, Environment env) {
+            super(programOpts, env);
+        }
+
+        @Override
+        protected int executeCommand() throws CommandException {
+            parseKeyAndTrustStores();
+
+            try {
+                store = KeyStore.getInstance(KeyStore.getDefaultType());
+                store.load(new FileInputStream(keystore), keystorePassword);
+            } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+                return ERROR;
+            }
+
+            List<X509Certificate> certificates = findSelfSignedCerts();
+            for (X509Certificate cert : certificates) {
+                try {
+                    String alias = store.getCertificateAlias(cert);
+                    userArgAlias = alias;
+                    String dname = cert.getSubjectX500Principal().getName();
+
+                    removeFromKeyStore(); //Remove old entry from keystore
+                    removeFromTrustStore(); //Remove old entry from truststore
+                    addToKeystore(dname, alias, keystore); //create new entry
+                    addToTruststore(alias); //Add new entry to truststore
+
+                } catch (KeyStoreException | CommandException ex) {
+                    LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
+                    return ERROR;
+                }
+            }
+
+            if (reload) {
+                restartHttpListeners();
+            }
+
+            return SUCCESS;
+        }
+    }
+
 }
