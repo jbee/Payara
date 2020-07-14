@@ -75,6 +75,43 @@ public class CertificateManagementKeytoolCommands {
 
         return keytoolCmd;
     }
+    
+    /**
+     * Constructs the command to pass to keytool for creating a self-signed cert that will be in a new keystore
+     *
+     * @param password The password for the key store
+     * @param alias    The alias of the certificate
+     * @param dname    The distinguished name of the certificate
+     * @return A String array to pass to {@link com.sun.enterprise.admin.servermgmt.KeystoreManager.KeytoolExecutor}
+     */
+    public static String[] constructGenerateCertKeytoolNewStoreCommand(char[] password,
+            String alias, String dname) {
+        String[] keytoolCmd = new String[]{"-genkeypair",
+                "-keyalg", "RSA",
+                "-keystore", "newstore.jks",
+                "-alias", alias,
+                "-dname", dname,
+                "-validity", "365",
+                "-keypass", new String(password),
+                "-storepass", new String(password)};
+
+        return keytoolCmd;
+    }
+            
+    public static String[] extractPrivateKeyFromKeystore(File keystore, char[] password, String alias) {
+        String[] keytoolCmd = new String[]{ "-importkeystore",
+            "-srckeystore", keystore.getAbsolutePath(),
+            "--srcstorepass", new String(password),
+            "-srcalias", alias,
+            "-keypass", new String(password),
+            "-destkeystore", keystore.getParent() + File.separator + "keystore.p12",
+            "-deststoretype", "PKCS12",
+            "-deststorepass", new String(password),
+            "-destkeypass", new String(password)
+            };
+        
+        return keytoolCmd;
+    }
 
     /**
      * Helper method that formats the String array of alternative names into the format that the keytool expects.
