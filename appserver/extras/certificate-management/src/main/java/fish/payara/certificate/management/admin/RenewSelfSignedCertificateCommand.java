@@ -45,20 +45,15 @@ import com.sun.enterprise.admin.servermgmt.RepositoryException;
 import fish.payara.certificate.management.CertificateManagementKeytoolCommands;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.glassfish.api.admin.CommandException;
@@ -66,10 +61,15 @@ import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
 
 /**
- *
+ * Replaces all self-signed certificates with new ones
+ * that have the same alias and dname.
+ * 
+ * These new certificates WILL have different fringerprints to
+ * the old ones.
  * @author jonathan coustick
+ * @since 5.21.0
  */
-@Service(name = "renew-self-signed-certificate")
+@Service(name = "renew-self-signed-certificates")
 @PerLookup
 public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCommand {
 
@@ -93,46 +93,17 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
         for (X509Certificate cert : certificates) {
             try {
                 String alias = store.getCertificateAlias(cert);
-                LOGGER.log(Level.INFO, "Renewing certifacte with alias {0}", alias);
-                exportPrivateKey(alias);
-                LOGGER.log(Level.INFO, "Generating CSR...");
-                generateCsr(alias);
-                LOGGER.log(Level.INFO, "Signing CSR with private key...");
-                signRequest(alias);
-                LOGGER.log(Level.INFO, "Writing keystore back to file...");
-                CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                LOGGER.log(Level.INFO, "Got cert factory...");
-                File certFile = new File(getInstallRootPath() + File.separator + "tls" + File.separator + "result.crt");
-                if (!certFile.exists() && !certFile.canRead()) {
-                    LOGGER.log(Level.INFO, "Cannot read file {0}", certFile.getCanonicalPath());
-                }
-                FileInputStream inputStream = new FileInputStream(certFile);
-                LOGGER.log(Level.INFO, "Generating certificate...");
-                Certificate newCert = factory.generateCertificate(inputStream);
-                LOGGER.log(Level.INFO, newCert.toString());
-                store.setCertificateEntry(alias, newCert);
-                LOGGER.log(Level.INFO, "File write...");
-                FileOutputStream writeOut = new FileOutputStream(keystore);
-                store.store(writeOut, keystorePassword);
-                LOGGER.log(Level.INFO, "All done");
-            } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException | CommandException ex) {
+                userArgAlias = alias;
+                String dname = cert.getSubjectX500Principal().getName();
+
+                removeFromKeyStore(); //Remove old entry from keystore
+                removeFromTrustStore(); //Remove old entry from truststore
+                addToKeystore(dname, alias, keystore); //create new entry
+                addToTruststore(alias); //Add new entry to truststore
+                
+            } catch (KeyStoreException | CommandException ex) {
                 LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
                 return ERROR;
-            } finally {
-                //Clear up after ourselves
-                File privateKeyFile = new File(keystore.getParent() + File.separator + "keystore.p12");
-                if (privateKeyFile.exists()) {
-                    privateKeyFile.delete();
-                }
-                File keyFile = new File("key.pem");
-                if (keyFile.exists()) {
-                    keyFile.delete();
-                }
-                
-                File certFolder = new File(getInstallRootPath() + File.separator + "tls");
-                if (certFolder.exists()) {
-                    certFolder.delete();
-                }
             }
         }
 
@@ -155,43 +126,11 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
         }
         return selfSignedCerts;
     }
-
-    private void exportPrivateKey(String alias) throws CommandException {
-        String[] privCommand = CertificateManagementKeytoolCommands.extractPrivateKeyFromKeystore(keystore, keystorePassword, alias);
-        LOGGER.log(Level.SEVERE, Arrays.toString(privCommand));
-        KeystoreManager.KeytoolExecutor keytoolExecutor = new KeystoreManager.KeytoolExecutor(
-                CertificateManagementKeytoolCommands.extractPrivateKeyFromKeystore(keystore, keystorePassword, alias), 60);
-        try {
-            LOGGER.log(Level.SEVERE, "about to extract private key");
-            keytoolExecutor.execute("unableExtractPrivateKey", keystore);
-            LOGGER.log(Level.SEVERE, "extracted private key");
-        } catch (RepositoryException re) {
-            logger.severe(re.getCause().getMessage()
-                    .replace("keytool error: java.lang.Exception: ", "")
-                    .replace("keytool error: java.io.IOException: ", ""));
-            throw new CommandException(re);
-        }
-
-        ProcessBuilder builder = new ProcessBuilder();
-        builder = builder.command("openssl", "pkcs12", "-in", keystore.getParent() + File.separator + "keystore.p12", "-nodes", "-nocerts", "-out", "key.pem");
-        try {
-            LOGGER.log(Level.SEVERE, Arrays.toString(builder.command().toArray()));
-            Process result = builder.start();
-            result.waitFor(1, TimeUnit.MINUTES);
-            if (result.exitValue() != 0) {
-                throw new CommandException("Unable to extract certicate");
-            }
-
-        } catch (IOException | InterruptedException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            throw new CommandException(ex);
-        }
-    }
-
-    private void addToKeystore(String dname, String alias) throws CommandException {
+    
+    private void addToKeystore(String dname, String alias, File keyStore) throws CommandException {
         // Run keytool command to generate self-signed cert
         KeystoreManager.KeytoolExecutor keytoolExecutor = new KeystoreManager.KeytoolExecutor(
-                CertificateManagementKeytoolCommands.constructGenerateCertKeytoolNewStoreCommand(keystorePassword, alias, dname), 60);
+                CertificateManagementKeytoolCommands.constructGenerateCertKeytoolCommand(keyStore, keystorePassword, alias, dname, new String[0]), 60);
 
         try {
             keytoolExecutor.execute("certNotCreated", keystore);
@@ -203,23 +142,10 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
         }
     }
 
-    private void generateCsr(String alias) throws CommandException {
-        // Get CSR install dir and ensure it actually exists
-        File csrLocation = new File(getInstallRootPath() + File.separator + "tls");
-        if (!csrLocation.exists()) {
-            csrLocation.mkdir();
-        }
-
-        // Run keytool command to generate self-signed cert
-        KeystoreManager.KeytoolExecutor keytoolExecutor = new KeystoreManager.KeytoolExecutor(
-                CertificateManagementKeytoolCommands.constructGenerateCertRequestKeytoolCommand(
-                        keystore, keystorePassword,
-                        new File(csrLocation.getAbsolutePath() + File.separator + alias + ".csr"),
-                        alias),
-                60);
-
+    private void addToTruststore(String alias) throws CommandException {
+        KeystoreManager manager = new KeystoreManager();
         try {
-            keytoolExecutor.execute("csrNotCreated", keystore);
+            manager.copyCert(keystore, truststore, alias, new String(masterPassword()));
         } catch (RepositoryException re) {
             logger.severe(re.getCause().getMessage()
                     .replace("keytool error: java.lang.Exception: ", "")
@@ -227,25 +153,5 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
             throw new CommandException(re);
         }
     }
-
-    private void signRequest(String alias) throws CommandException {
-        File csrLocation = new File(getInstallRootPath() + File.separator + "tls" + File.separator + alias + ".csr");
-        
-        ProcessBuilder builder = new ProcessBuilder();
-        builder = builder.command("openssl", "x509", "-req", "-days", "365", "-in", csrLocation.getAbsolutePath(),
-                "-signkey", "key.pem", "-sha256", "-out", csrLocation.getParent() + File.separator + "result.crt");
-        try {
-            Process result = builder.start();
-            result.waitFor(1, TimeUnit.MINUTES);
-            if (result.exitValue() != 0) {
-                throw new CommandException("Unable to extract certicate");
-            }
-
-        } catch (IOException | InterruptedException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            throw new CommandException(ex);
-        }
-
-    }
-    
+  
 }
