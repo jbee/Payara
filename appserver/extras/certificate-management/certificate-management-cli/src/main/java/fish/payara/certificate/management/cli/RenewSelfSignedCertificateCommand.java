@@ -76,7 +76,7 @@ import org.jvnet.hk2.annotations.Service;
 @PerLookup
 public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCommand {
 
-    private static final Logger LOGGER = Logger.getLogger(CLICommand.class.getPackage().getName());
+    private static final Logger LOGGER = Logger.getLogger(RenewSelfSignedCertificateCommand.class.getPackage().getName());
 
     @Param(name = "reload", optional = true)
     private boolean reload;
@@ -106,19 +106,8 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
 
         List<X509Certificate> certificates = findSelfSignedCerts();
         for (X509Certificate cert : certificates) {
-            try {
-                String alias = store.getCertificateAlias(cert);
-                userArgAlias = alias;
-                String dname = cert.getSubjectX500Principal().getName();
-
-                removeFromKeyStore(); //Remove old entry from keystore
-                removeFromTrustStore(); //Remove old entry from truststore
-                addToKeystore(dname, alias, keystore); //create new entry
-                addToTruststore(alias); //Add new entry to truststore
-
-            } catch (KeyStoreException | CommandException ex) {
-                LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
-                return ERROR;
+            if (renewCertificate(cert) == ERROR) {
+                    return ERROR;
             }
         }
 
@@ -193,18 +182,7 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
 
             List<X509Certificate> certificates = findSelfSignedCerts();
             for (X509Certificate cert : certificates) {
-                try {
-                    String alias = store.getCertificateAlias(cert);
-                    userArgAlias = alias;
-                    String dname = cert.getSubjectX500Principal().getName();
-
-                    removeFromKeyStore(); //Remove old entry from keystore
-                    removeFromTrustStore(); //Remove old entry from truststore
-                    addToKeystore(dname, alias, keystore); //create new entry
-                    addToTruststore(alias); //Add new entry to truststore
-
-                } catch (KeyStoreException | CommandException ex) {
-                    LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
+                if (renewCertificate(cert) == ERROR) {
                     return ERROR;
                 }
             }
@@ -214,6 +192,23 @@ public class RenewSelfSignedCertificateCommand extends AbstractCertManagementCom
             }
 
             return SUCCESS;
+        }
+    }
+    
+    private int renewCertificate(X509Certificate cert) {
+        try {
+            String alias = store.getCertificateAlias(cert);
+            userArgAlias = alias;
+            String dname = cert.getSubjectX500Principal().getName();
+
+            removeFromKeyStore(); //Remove old entry from keystore
+            removeFromTrustStore(); //Remove old entry from truststore
+            addToKeystore(dname, alias, keystore); //create new entry
+            addToTruststore(alias); //Add new entry to truststore
+            return SUCCESS;
+        } catch (KeyStoreException | CommandException ex) {
+            LOGGER.log(Level.SEVERE, "Error renewing certificate", ex);
+            return ERROR;
         }
     }
 
