@@ -38,8 +38,8 @@
     only if the new code is made subject to such option by the copyright
     holder.
 
-   Portions Copyright [2016] [Payara Foundation] 
+   Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 -->
 
-"<link rel="icon" href="#{request.contextPath}/resource/community-theme/images/favicon.ico" type="image/x-icon" />
-"<link rel="shortcut icon" href="#{request.contextPath}/resource/community-theme/images/favicon.ico" type="image/x-icon" />
+"<link rel="icon" href="#{request.contextPath}/resource/payara-enterprise-theme/images/favicon.ico" type="image/x-icon" />
+"<link rel="shortcut icon" href="#{request.contextPath}/resource/payara-enterprise-theme/images/favicon.ico" type="image/x-icon" />

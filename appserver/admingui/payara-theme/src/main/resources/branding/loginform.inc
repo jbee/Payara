@@ -38,17 +38,17 @@
     only if the new code is made subject to such option by the copyright
     holder.
 
-   Portions Copyright [2016-2019] [Payara Foundation] 
+   Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 -->
 
 <f:verbatim>
-<div style="height: 435px;background: #ffffff url(#{request.contextPath}/resource/community-theme/images/login-backimage-open.png);
+<div style="height: 435px;background: #ffffff url(#{request.contextPath}/resource/payara-enterprise-theme/images/login-backimage-open.png);
     background-repeat:no-repeat;background-position:left top; width: 720px; margin: auto; margin: auto; -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;">
     <div style="width: 460px; padding-top: 160px; margin-left: 310px;">
 </f:verbatim>
-        <sun:image url="#{request.contextPath}/resource/community-theme/images/login-product_name_open.png" alt="$resource{theme.productName}" height="42" width="329" >
+        <sun:image url="#{request.contextPath}/resource/payara-enterprise-theme/images/login-product_name_open.png" alt="$resource{theme.productName}" height="42" width="329" >
         <!beforeCreate
-                setResourceBundle(key="theme" bundle="org.glassfish.admingui.community-theme.Strings");
+                setResourceBundle(key="theme" bundle="fish.payara.admingui.enterprise-theme.Strings");
             />
         </sun:image>
 <f:verbatim>
