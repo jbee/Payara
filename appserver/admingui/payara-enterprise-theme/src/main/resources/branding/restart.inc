@@ -41,7 +41,7 @@
     Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 -->
 <f:verbatim>
-<td class="LogCntTd" style="background-image: url(#{request.contextPath}/resource/community-theme/images/backimage.png);background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">
+<td class="LogCntTd" style="background-image: url(#{request.contextPath}/resource/payara-enterprise-theme/images/backimage.png);background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">
     <!--<td class="LogCntTd" style="background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">-->
     <table border="0" background="/resource/images/dot.gif" cellpadding="0" cellspacing="0" width="100%" title="">
         <tr>

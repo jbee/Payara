@@ -41,14 +41,18 @@
    Portions Copyright [2016] [Payara Foundation] 
 -->
 
-<!initPage
-    setResourceBundle(key="theme" bundle="org.glassfish.admingui.community-theme.Strings");
-/>
-<sun:form>
-    <sun:versionPage id="version"
-        productImageURL="/resource/community-theme/images/VersionProductName.png"
-        productImageDescription="$resource{theme.productName}"
-        versionString="#{sessionScope.appServerVersion}"
-        copyrightString="$resource{theme.copyright.fullPage}"
-    />
-</sun:form>
+<ui:event type="initPage">
+    setResourceBundle(key="i18nce" bundle="org.glassfish.admingui.community-theme.Strings");
+    setPageSessionAttribute(key="contentCSS" value="position:absolute; overflow:auto; top:0px; width:100%; height:auto; bottom:200px;");
+</ui:event>
+<f:verbatim>
+    <div id="adframe" style="position:absolute; bottom:0px; height:197px; width:100%; z-index:100;">
+	&nbsp;
+    </div>
+    <script type="text/javascript">
+	function frameOnload() {
+	    var adframe = document.getElementById('adframe');
+	    adframe.innerHTML = '<iframe id="upsell" style="height:100%; width:100%;" frameborder="0" src="#{request.scheme}://$resource{i18nce.promotionLink}"></iframe>';
+	}
+    </script>
+</f:verbatim>

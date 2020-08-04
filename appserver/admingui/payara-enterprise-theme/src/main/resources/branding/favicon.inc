@@ -38,17 +38,8 @@
     only if the new code is made subject to such option by the copyright
     holder.
 
-   Portions Copyright [2016] [Payara Foundation] 
+   Portions Copyright [2020] [Payara Foundation and/or its affiliates]
 -->
 
-<!initPage
-    setResourceBundle(key="theme" bundle="org.glassfish.admingui.community-theme.Strings");
-/>
-<sun:form>
-    <sun:versionPage id="version"
-        productImageURL="/resource/community-theme/images/VersionProductName.png"
-        productImageDescription="$resource{theme.productName}"
-        versionString="#{sessionScope.appServerVersion}"
-        copyrightString="$resource{theme.copyright.fullPage}"
-    />
-</sun:form>
+"<link rel="icon" href="#{request.contextPath}/resource/payara-enterprise-theme/images/favicon.ico" type="image/x-icon" />
+"<link rel="shortcut icon" href="#{request.contextPath}/resource/payara-enterprise-theme/images/favicon.ico" type="image/x-icon" />
