@@ -48,19 +48,43 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicate the Payara TestContainer based extension. Test class must be extending from {@link AbstractPayaraTest}.
+ * Indicate the Payara Integration Testing based extension. Test class must be extending from {@link AbstractPayaraTest}.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(PayaraContainerTestExtension.class)
 public @interface PayaraContainerTest {
+    /**
+     * Defines the Docker Image which will be used for running the integration test. The value can be unspecified when
+     * you want to make use of a ParameterizedTest but this is not recommended in combination with the CI environment.
+     * In addition to the values 'server', 'micro' and 'custom', also the Payara Version and JDK version can be specified.
+     * For more information, have a look at the guide.md.
+     * @return Docker Image type, Payara Version, and JDK. See guide.md.
+     */
     String value() default "";  // Set to the 'version' of the container or use ParameterizedTest
 
+    /**
+     * Define a non-zero value to activate the wait so that remote debugging can be started. For more information, see guide.md.
+     * @return Number of seconds to wait for the remote debugging to attach or 0 to not start in debug mode.
+     */
     long debugWait() default 0; // If != 0, activates debugging. Value is time to wait (seconds) when container is started to allow connection of debugger.
 
+    /**
+     * Defines if a test application ios deployed in the Docker Container or not. Currently a test application is always required when using the container type 'custom'.
+     * @return true (default) when test application (war or ear) is deployed into the Docker Container.
+     */
     boolean testApplication() default true;
 
+    /**
+     * When verbose logging (default is false) is activated, the server.log is send to the test run output.
+     * @return true when verbose logging needs to be activated.
+     */
     boolean verboseLogging() default false;
 
+    /**
+     * By default (value returns false), the '--noCluster'  option is used to start Payara Micro in the test. If integration test requires
+     * a Payara Micro cluster, set this value to 'true' and look in the guide.md how to define the other instances.
+     * @return
+     */
     boolean microCluster() default false;  // false -> --noCluster for Micro.
 }
