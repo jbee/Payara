@@ -1029,9 +1029,6 @@ admingui.help = {
 
     launchHelp: function(url) {
         var helpLink = "/common/help/help.jsf";
-        if (url === undefined) {
-            var helpLink = "https://docs.payara.fish/";
-        }
         var helpKeys = admingui.util.findNodes(document,
             function(node, name) {
                 if ((typeof(node.id) === "undefined") || (node.id == null)) {
@@ -1054,6 +1051,15 @@ admingui.help = {
         } else {
             admingui.help.openHelpWindow(helpLink);
         }
+        return false;
+    },
+
+    launchVersion: function() {
+        var win = window.open('/common/version.jsf', "VersionWindow" , 'scrollbars,resizable,width=800,height=740,top='+((screen.height - (screen.height/1.618)) - (500/2))+',left='+((screen.width-650)/2));
+        if (win) {
+            win.focus();
+        }
+        return false;
     },
 
     openHelpWindow: function (url) {
@@ -1061,6 +1067,7 @@ admingui.help = {
         if (win) {
             win.focus();
         }
+        return false;
     },
 
     switchTab: function(tabElement, toShow, toHide) {
