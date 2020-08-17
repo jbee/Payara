@@ -46,7 +46,7 @@
     <parent>
         <groupId>fish.payara.server.internal.admingui</groupId>
         <artifactId>admingui</artifactId>
-        <version>5.21.0-SNAPSHOT</version>
+        <version>5.22.0-SNAPSHOT</version>
     </parent>
     <artifactId>console-core</artifactId>
     <packaging>glassfish-jar</packaging>
@@ -71,6 +71,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
                 <excludes>
                     <exclude>**/*.jar</exclude>
                 </excludes>

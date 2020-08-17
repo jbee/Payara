@@ -1,7 +1,8 @@
 <!--
 
     Copyright (c) 2017, 2018 Oracle and/or its affiliates. All rights reserved.
-
+    Portions Copyright &#169; [2017-2020] Payara Foundation and/or affiliates.
+    
     This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v. 2.0, which is available at
     http://www.eclipse.org/legal/epl-2.0.
@@ -17,7 +18,7 @@
 -->
 
 <toc version="2.0">
-  <tocitem target="tasks-topic-group" text="GlassFish Server Administration Console Tasks" expand="false">
+  <tocitem target="tasks-topic-group" text="Payara Server Administration Console Tasks" expand="false">
     <tocitem target="task-group-configwebcontainer" text="Configuring the Web Container" expand="false">
       <tocitem target="task-webcontainergeneral" text="To Configure General Properties for the Web Container" expand="false"></tocitem>
       <tocitem target="task-webcontainersessiontimeout" text="To Configure Session Properties for the Web Container" expand="false"></tocitem>
@@ -59,7 +60,7 @@
       <tocitem target="task-threadpooldelete" text="To Delete a Thread Pool" expand="false"></tocitem>
     </tocitem>
   </tocitem>
-  <tocitem target="ref-topic-group" text="GlassFish Server Administration Console Reference" expand="false">
+  <tocitem target="ref-topic-group" text="Payara Server Administration Console Reference" expand="false">
     <tocitem target="ref-group-configuration" text="Configurations" expand="false">
       <tocitem target="ref-group-availabilityservice" text="Availability Service" expand="false">
         <tocitem target="ref-webcontaineravailability" text="Web Container Availability" expand="false"></tocitem>
