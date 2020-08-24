@@ -92,7 +92,7 @@ public class PayaraContainer extends AbstractContainer<PayaraContainer> {
             if (adapterMetaData.isTestApplication()) {
                 withReadinessPath("/health", Config.getAppStartTimeout());
             } else {
-                withReadinessPath("/",  Config.getAppStartTimeout());  // FIXME This fails with Payara Micro
+                withReadinessPath("/",  Config.getAppStartTimeout());  // TODO This fails with Payara Micro
             }
         }
     }

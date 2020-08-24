@@ -204,7 +204,7 @@ public class TestcontainersController {
 
     public void startPlainContainers(Method requiredTestMethod) {
         // In case of the ParameterizedTest, we start Plain Containers
-        // FIXME Merge with startPayaraContainer
+        // TODO Merge with startPayaraContainer
         LOG.info("Starting plain Java containers  " + testClass + "#" + requiredTestMethod.getName());
         long start = System.currentTimeMillis();
 
@@ -232,7 +232,7 @@ public class TestcontainersController {
         LOG.info("Containers started in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    // FIXME Support for Starting microImageContainers in ParameterizedTest.
+    // TODO Support for Starting microImageContainers in ParameterizedTest.
 
     public void stop() throws IllegalAccessException {
         // Stop all Containers in the AfterAll. Some containers can already be stopped by the AfterEach.
@@ -282,7 +282,7 @@ public class TestcontainersController {
         LOG.info("Docker Image containers stopped in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    // FIXME Support for Stopping microImageContainers in ParameterizedTest.
+    // TODO Support for Stopping microImageContainers in ParameterizedTest.
 
     public void afterTest(TestDescription description, Optional<Throwable> throwable) {
         // So that we can stop and save the recoding if test failed

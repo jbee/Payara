@@ -79,7 +79,7 @@ public class LoggableImageFromDockerFile extends ImageFromDockerfile {
     }
 
     // TODO We do not have any logging when Docker starts to download a new image.
-    //  This can take a wail so best to have some logging.
+    //  This can take a while so best to have some logging.
     //  But not yet determined how it can be done.
     //  It is part of the 'docker build' which is performed by org.testcontainers.images.builder.ImageFromDockerfile.resolve
 
@@ -92,10 +92,9 @@ public class LoggableImageFromDockerFile extends ImageFromDockerfile {
         // Parsing DockerFile to
         try {
             List<String> lines = Files.readAllLines(dockerfile, StandardCharsets.UTF_8);
-            // FIXME This doesn't work for multi stage build files in Custom type.
+            // TODO This doesn't work for multi stage build files in Custom type.
             Optional<String> fromClause = lines.stream().filter(l -> l.trim().startsWith("FROM")).findAny();
             String name = plainImage ? "PlainContainer" : "Custom";
-            // FIXME Maybe some defensive program required
             fromClause.ifPresent(s -> baseImage = name + s.trim().split(" ")[1]);
         } catch (IOException e) {
             throw new UnexpectedException("IOException during reading of the dockerFile", e);

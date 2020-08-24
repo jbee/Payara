@@ -128,7 +128,7 @@ public class PayaraContainerTestExtension implements BeforeAllCallback, AfterAll
             Object invocationContext = getValueOf(testDescriptor, "invocationContext");
             Object[] arguments = getValueOf(invocationContext, "arguments");
 
-            ServerAdapterMetaData adapterMetaData = ServerAdapterMetaData.parse(arguments[0].toString());// FIXME can arguments be null??
+            ServerAdapterMetaData adapterMetaData = ServerAdapterMetaData.parse(arguments[0].toString());
 
             Class<?> testClass = context.getRequiredTestClass();
             boolean databaseRequired = checkMarker(testClass, DatabaseRequiredTest.class);

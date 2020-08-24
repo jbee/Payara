@@ -37,49 +37,73 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.testing.core;
+package fish.payara.testing.core.config;
 
-import fish.payara.testing.core.config.Config;
-import fish.payara.testing.core.server.ServerAdapter;
-import fish.payara.testing.core.server.ServerAdapterMetaData;
-import fish.payara.testing.core.util.DockerImageProcessor;
+import fish.payara.testing.core.server.JDKRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Network;
 
-public class PayaraMicroContainer extends AbstractContainer<PayaraMicroContainer> {
+public final class Config {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PayaraMicroContainer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
-    private boolean verboseLogging;
+    private static Double factor;
 
-    public PayaraMicroContainer(ServerAdapterMetaData adapterMetaData, boolean verboseLogging, String name) {
-        super(DockerImageProcessor.getImage(adapterMetaData, findAppFile(adapterMetaData.isTestApplication(), LOGGER), name));
-        this.verboseLogging = verboseLogging;
-        setNetwork(Network.SHARED);
+    private Config() {
     }
 
-    @Override
-    protected void configure() {
-        super.configure();
-        // FIXME Review new ServerAdapter();
-        containerConfiguration(new ServerAdapter(), verboseLogging, LOGGER);
-        // TODO it is assumed there is always a test application when using PayaraMicroContainer
-        withReadinessPath("/health", Config.getAppStartTimeout());
+    public static String getVersion() {
+        return System.getProperty("payara.version", Defaults.VERSION);
+
     }
 
-    @Override
-    public String getApplicationPort() {
-        return "8080";
+    public static JDKRuntime getJDKRuntime() {
+        return JDKRuntime.parse(System.getProperty("payara.test.container.jdk", Defaults.JDK_RUNTIME));
     }
 
-    @Override
-    public int getMappedApplicationPort() {
-        return getMappedPort(8080);
+    /**
+     * @return The amount of time (in seconds) to wait for a runtime to start before
+     * assuming that application start has failed and aborting the start process.
+     * <p>
+     * With the env property 'payara.test.timeout.factor' you can increase this.
+     */
+    public static int getAppStartTimeout() {
+
+        return (int) (30 * getFactor());
     }
 
-    @Override
-    public String getWebConsolePort() {
-        return null;
+    public static int getElementWaitTimeout() {
+        return (int) (30 * getFactor());
+    }
+
+    public static double getFactor() {
+        if (factor == null) {
+            factor = readFactor();
+        }
+        return factor;
+    }
+
+    private static Double readFactor() {
+        String value = System.getenv("payara_test_timeout_factor");
+        double result = 1.0;
+        if (value == null || value.isEmpty()) {
+            return result;
+        }
+        try {
+            result = Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            LOGGER.warn(String.format("The env variable payara_test_timeout_factor is not a valid number(double) : '%s'. Using factor 1.0", value));
+        }
+        if (result <= 0.0) {
+            result = 1.0;
+            LOGGER.warn(String.format("The env variable payara_test_timeout_factor is zero or negative : '%s'. Using factor 1.0", value));
+        }
+        return result;
+    }
+
+    private static class Defaults {
+        // read version from Maven.
+        static final String VERSION = Defaults.class.getPackage().getImplementationVersion();
+        static final String JDK_RUNTIME = JDKRuntime.JDK8.name();
     }
 }

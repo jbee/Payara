@@ -58,7 +58,7 @@ public final class DeploymentGroupWebConsoleParser {
     }
 
     public List<DeploymentGroupInfo> parseTable(String html) {
-        // FIXME We probably can handle this with Selenium stuff instead of using JSoup.
+        // TODO We probably can handle this with Selenium stuff instead of using JSoup.
         List<DeploymentGroupInfo> result = new ArrayList<>();
 
         Document doc = Jsoup.parse(html);

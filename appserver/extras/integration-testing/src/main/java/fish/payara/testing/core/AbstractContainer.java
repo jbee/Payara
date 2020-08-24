@@ -144,7 +144,6 @@ public abstract class AbstractContainer<T extends GenericContainer<T>> extends G
      * @param logger The Logger for verbose logging.
      */
     protected void containerConfiguration(ServerAdapter adapter, boolean verboseLogging, Logger logger) {
-        // FIXME Review, after we are using restClient to access endpoints in some cases.
         addExposedPorts(adapter.getDefaultHttpPort());
         if (verboseLogging) {
             withLogConsumer(new Slf4jLogConsumer(logger));
@@ -162,7 +161,7 @@ public abstract class AbstractContainer<T extends GenericContainer<T>> extends G
             try {
                 return Files.walk(dir.toPath())
                         .filter(Files::isRegularFile)
-                        .filter(p -> p.toString().toLowerCase().endsWith(".war"))  // FIXME Support for ear !!
+                        .filter(p -> p.toString().toLowerCase().endsWith(".war"))  // TODO Support for ear !!
                         .map(Path::toFile)
                         .collect(Collectors.toSet());
             } catch (IOException ignore) {

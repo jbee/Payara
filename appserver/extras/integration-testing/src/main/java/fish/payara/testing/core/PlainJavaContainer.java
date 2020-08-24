@@ -67,7 +67,6 @@ public class PlainJavaContainer extends AbstractContainer<PlainJavaContainer> {
     @Override
     protected void configure() {
         super.configure();
-        // FIXME Wrong exposed port
         containerConfiguration(adapter, verboseLogging, LOGGER);
 
         waitingFor(new NoWait());

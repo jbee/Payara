@@ -37,32 +37,49 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.testing.core.server;
+package fish.payara.testing.core;
 
-public class ServerAdapter {
-    // FIXME Not useful as class since methods returns only constants.
+import fish.payara.testing.core.config.Config;
+import fish.payara.testing.core.server.ServerAdapter;
+import fish.payara.testing.core.server.ServerAdapterMetaData;
+import fish.payara.testing.core.util.DockerImageProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
-    /**
-     * @return The default HTTP port for this runtime
-     */
-    public int getDefaultHttpPort() {
-        return 8080;
+public class PayaraMicroContainer extends AbstractContainer<PayaraMicroContainer> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PayaraMicroContainer.class);
+
+    private boolean verboseLogging;
+
+    public PayaraMicroContainer(ServerAdapterMetaData adapterMetaData, boolean verboseLogging, String name) {
+        super(DockerImageProcessor.getImage(adapterMetaData, findAppFile(adapterMetaData.isTestApplication(), LOGGER), name));
+        this.verboseLogging = verboseLogging;
+        setNetwork(Network.SHARED);
     }
 
-    /**
-     * @return The default HTTPS port for this runtime
-     */
-    public int getDefaultHttpsPort() {
-        return 8181;
+    @Override
+    protected void configure() {
+        super.configure();
+        // TODO Review new ServerAdapter();
+        containerConfiguration(new ServerAdapter(), verboseLogging, LOGGER);
+        // TODO it is assumed there is always a test application when using PayaraMicroContainer
+        withReadinessPath("/health", Config.getAppStartTimeout());
     }
 
-
-    public String getPayaraDomainDirectory() {
-        return "/opt/payara/appserver";
+    @Override
+    public String getApplicationPort() {
+        return "8080";
     }
 
-    public String getPasswordFile() {
-        // FIXME Should we retrieve this from "echo ${PASSWORD_FILE}" command within container?
-        return "/opt/payara/passwordFile";
+    @Override
+    public int getMappedApplicationPort() {
+        return getMappedPort(8080);
+    }
+
+    @Override
+    public String getWebConsolePort() {
+        return null;
     }
 }

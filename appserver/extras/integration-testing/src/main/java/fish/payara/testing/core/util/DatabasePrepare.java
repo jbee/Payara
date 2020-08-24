@@ -65,7 +65,7 @@ public final class DatabasePrepare {
     public static void perform(JdbcDatabaseContainer<?> container) throws SQLException, DatabaseUnitException, URISyntaxException, IOException {
 
         // Create empty tables
-        // FIXME make "init.sql" a (default) parameter so that other names can be specified
+        // TODO make "init.sql" a (default) parameter so that other names can be specified
         ScriptUtils.runInitScript(new JdbcDatabaseDelegate(container, ""), "init.sql");
 
 
@@ -74,7 +74,7 @@ public final class DatabasePrepare {
                 getConnection(container.getJdbcUrl() , container.getUsername(), container.getPassword());
         IDatabaseConnection connection = new MySqlConnection(dbUnitConnection, container.getDatabaseName());
 
-        // FIXME make "data.xls" a (default) parameter so that other names can be specified
+        // TODO make "data.xls" a (default) parameter so that other names can be specified
         URL testDataFile = DatabasePrepare.class.getClassLoader().getResource("data.xls");
         IDataSet dataSet = new XlsDataSet(Paths.get(testDataFile.toURI()).toFile());
 

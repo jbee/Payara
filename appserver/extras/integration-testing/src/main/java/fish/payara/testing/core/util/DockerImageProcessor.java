@@ -189,7 +189,7 @@ public final class DockerImageProcessor {
         return result.toString();
     }
 
-    // FIXME Move this logic out of this class so that it can be tested.
+    // TODO Move this logic out of this class so that it can be tested.
     private static String updateTag(String content, ServerAdapterMetaData metaData) {
         return Arrays.stream(content.split("\n"))
                 .map(l -> processLine(l, metaData))

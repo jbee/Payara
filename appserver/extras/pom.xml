@@ -62,7 +62,7 @@
         <module>appserv-rt</module>
         <module>payara-micro</module>
         <module>certificate-management</module>
-        <module>testing</module>
+        <module>integration-testing</module>
     </modules>
 
     <profiles>
