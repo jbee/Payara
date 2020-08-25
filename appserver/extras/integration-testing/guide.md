@@ -137,6 +137,15 @@ The recognized values are `jdk8` and `jdk11`.  Anything else will be ignored and
 
 The version is ignored when using a `custom` image. See  [Custom container](custom_container)
 
+## Grouping for CI
+
+It is recommended to use test suites or `@Tag` to group the different tests which need to run on the same runtime, Payara Server or Payara Micro. This also allows us to run tests either on the Full profile or the Web profile.
+
+1. A Test suite or `@Tag` with all tests having `@PayaraContainerTest("server")` and `@PayaraContainerTest("custom")`  
+2. A Test suite or `@Tag` with all tests having `@PayaraContainerTest("micro")`
+
+When you run the first group, it will run all tests for the Payara Server (assuming all custom based images are also Payara Server) and by default, they run with the full Profile. By setting the option `-Dpayara.test.container.variant=web` and you run it again, all the tests are performed with the Web profile version of the Payara Server.
+  
 ## Types of Containers
 
 The `Integration Testing Framework` project has 3 different types of Containers
