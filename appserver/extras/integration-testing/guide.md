@@ -225,6 +225,15 @@ Also, there is no need to add a command to include the test application to the i
 
      ADD test.war /opt/payara/deployments
 
+## Enterprise Images support
+
+When the specified version is a released enterprise version, the correct repository is added to the from clause.  The following rules are applied.
+
+- Version should not contain `-RC` or `-SNAPSHOT`.
+- minor version should indicate an Enterprise number (bewteen 20 and 99)
+
+When a version is determined to be an Enterprise version which has a Docker Image on the Payara Nexus server, the appropriate repo is added where needed (`nexus.payara.fish:5000/`). This is the case when the _standard_ image will be used or when the custom Docker file (`src/docker/custom/payara.docker`) is used (FROM is rewritten, just as what happens with the version.) 
+ 
 ## Submit asadmin commands
 
 The main container (Java class PayaraContainer) has support for submitting _asadmin_ commands to the DAS and reading the outcome.

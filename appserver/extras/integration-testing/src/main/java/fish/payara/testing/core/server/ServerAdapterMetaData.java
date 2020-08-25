@@ -41,13 +41,19 @@ package fish.payara.testing.core.server;
 
 import fish.payara.testing.core.config.Config;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ServerAdapterMetaData {
+
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d)\\.(\\d*)\\.(\\d)([\\S]*)");
 
     private RuntimeType runtimeType;
     private String payaraVersion;
     private JDKRuntime jdkRuntime;
     private boolean testApplication;
     private boolean microCluster;
+    private boolean payaraEnterpriseReleasedVersion;
 
     private ServerAdapterMetaData() {
     }
@@ -82,6 +88,10 @@ public class ServerAdapterMetaData {
 
     public boolean isMicroCluster() {
         return microCluster;
+    }
+
+    public boolean isPayaraEnterpriseReleasedVersion() {
+        return payaraEnterpriseReleasedVersion;
     }
 
     public static ServerAdapterMetaData parse(String data) {
@@ -119,7 +129,25 @@ public class ServerAdapterMetaData {
             result.jdkRuntime = Config.getJDKRuntime();
         }
 
+        determineEnterpriseVersionReleased(result);
         return result;
+    }
+
+    private static void determineEnterpriseVersionReleased(ServerAdapterMetaData result) {
+        if (result.getPayaraVersion() == null) {
+            // happens only during Test when  Config.getVersion() doesn't return anything.
+            return;
+        }
+        Matcher matcher = VERSION_PATTERN.matcher(result.getPayaraVersion());
+        if (matcher.matches()) {
+            String group4 = matcher.group(4);
+            if (!group4.contains("-RC") && !group4.contains("-SNAPSHOT")) {  // When having -RC or -SNAPSHOT it is never a released version
+                int minor = Integer.parseInt(matcher.group(2));// The 'minor' number value.
+                if (minor >= 20 && minor < 100) {
+                    result.payaraEnterpriseReleasedVersion = true;
+                }
+            }
+        }
     }
 
     private static String restorePredefiniedValues(String data) {

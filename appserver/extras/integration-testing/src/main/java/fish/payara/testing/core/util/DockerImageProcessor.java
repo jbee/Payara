@@ -153,14 +153,15 @@ public final class DockerImageProcessor {
         if (metaData.getJdkRuntime() == JDKRuntime.JDK11) {
             version = "-jdk11";
         }
+        String repo = determineRepo(metaData);
         switch (metaData.getRuntimeType()) {
 
             case SERVER:
                 String dockerServerVariant = getDockerServerVariantName();
-                result.append("FROM payara/").append(dockerServerVariant).append(":").append(metaData.getPayaraVersion()).append(version).append("\n");
+                result.append("FROM ").append(repo).append("payara/").append(dockerServerVariant).append(":").append(metaData.getPayaraVersion()).append(version).append("\n");
                 break;
             case MICRO:
-                result.append("FROM payara/micro:").append(metaData.getPayaraVersion()).append(version).append("\n");
+                result.append("FROM ").append(repo).append("payara/micro:").append(metaData.getPayaraVersion()).append(version).append("\n");
 
                 String noCluster = "";
                 if (!metaData.isMicroCluster()) {
@@ -176,7 +177,7 @@ public final class DockerImageProcessor {
                         throw new DockerFileNotFound("./src/docker/custom/payara.docker");
                     }
                     String content = new String(Files.readAllBytes(Paths.get("./src/docker/custom/payara.docker")));
-                    result.append(updateTag(content, metaData));
+                    result.append(updateTag(content, metaData, repo));
                     result.append("\n");  // Make sure the ADD test.war ... is placed on a new line
 
                 } catch (IOException e) {
@@ -193,6 +194,14 @@ public final class DockerImageProcessor {
             result.append("ADD test.war /opt/payara/deployments\n");
         }
         return result.toString();
+    }
+
+    private static String determineRepo(ServerAdapterMetaData metaData) {
+        String result = "";
+        if (metaData.isPayaraEnterpriseReleasedVersion()) {
+            result = "nexus.payara.fish:5000/";
+        }
+        return result;
     }
 
     public static String getDockerServerVariantName() {
@@ -214,21 +223,21 @@ public final class DockerImageProcessor {
     }
 
     // TODO Move this logic out of this class so that it can be tested.
-    private static String updateTag(String content, ServerAdapterMetaData metaData) {
+    private static String updateTag(String content, ServerAdapterMetaData metaData, String repo) {
         return Arrays.stream(content.split("\n"))
-                .map(l -> processLine(l, metaData))
+                .map(l -> processLine(l, metaData, repo))
                 .collect(Collectors.joining("\n"));
     }
 
-    private static String processLine(String line, ServerAdapterMetaData metaData) {
+    private static String processLine(String line, ServerAdapterMetaData metaData, String repo) {
         String result = line.trim();
         if (result.toUpperCase(Locale.ENGLISH).startsWith("FROM")) {
-            result = updateVersion(result, metaData);
+            result = updateVersion(result, metaData, repo);
         }
         return result;
     }
 
-    private static String updateVersion(String fromLine, ServerAdapterMetaData metaData) {
+    private static String updateVersion(String fromLine, ServerAdapterMetaData metaData, String repo) {
         String[] parts = fromLine.split(" ");
         Matcher matcher = IMAGE_PATTERN.matcher(parts[1]);
 
@@ -238,6 +247,7 @@ public final class DockerImageProcessor {
         }
 
         StringBuilder newImage = new StringBuilder();
+        newImage.append(repo);  // If released enterprise version, append the Nexus repo
         newImage.append("payara/");
         newImage.append(getDockerServerVariantName());  // server-full, server-web etc
         newImage.append(':');

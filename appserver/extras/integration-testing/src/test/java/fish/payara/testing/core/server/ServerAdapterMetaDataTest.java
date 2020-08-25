@@ -62,6 +62,7 @@ class ServerAdapterMetaDataTest {
         assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.MICRO);
         assertThat(metaData.getPayaraVersion()).isEqualTo("5.193");
         assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK11);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
     }
 
     @Test
@@ -91,6 +92,7 @@ class ServerAdapterMetaDataTest {
         // Not that the following
         assertThat(metaData.getPayaraVersion()).isEqualTo(Config.getVersion());
         assertThat(metaData.getJdkRuntime()).isEqualTo(Config.getJDKRuntime());
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
     }
 
     @Test
@@ -100,6 +102,7 @@ class ServerAdapterMetaDataTest {
         assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
         assertThat(metaData.getPayaraVersion()).isEqualTo("5.202-SNAPSHOT");
         assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK11);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
     }
 
     @Test
@@ -109,15 +112,56 @@ class ServerAdapterMetaDataTest {
         assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
         assertThat(metaData.getPayaraVersion()).isEqualTo("5.202-RC");
         assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK11);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
     }
 
     @Test
-    void parse_useDefaultJDKIfUnknow() {
+    void parse_useDefaultJDKIfUnknown() {
         ServerAdapterMetaData metaData = ServerAdapterMetaData.parse("micro-5.193-something");
         assertThat(metaData).isNotNull();
         assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.MICRO);
         assertThat(metaData.getPayaraVersion()).isEqualTo("5.193");
         assertThat(metaData.getJdkRuntime()).isEqualTo(Config.getJDKRuntime());
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
     }
 
+    @Test
+    void parse_community() {
+        ServerAdapterMetaData metaData = ServerAdapterMetaData.parse("server-5.2020.3");
+        assertThat(metaData).isNotNull();
+        assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
+        assertThat(metaData.getPayaraVersion()).isEqualTo("5.2020.3");
+        assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK8);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
+    }
+
+    @Test
+    void parse_enterprise() {
+        ServerAdapterMetaData metaData = ServerAdapterMetaData.parse("server-5.21.0");
+        assertThat(metaData).isNotNull();
+        assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
+        assertThat(metaData.getPayaraVersion()).isEqualTo("5.21.0");
+        assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK8);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isTrue();
+    }
+
+    @Test
+    void parse_enterprise_jdk() {
+        ServerAdapterMetaData metaData = ServerAdapterMetaData.parse("server-5.21.0-jdk11");
+        assertThat(metaData).isNotNull();
+        assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
+        assertThat(metaData.getPayaraVersion()).isEqualTo("5.21.0");
+        assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK11);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isTrue();
+    }
+
+    @Test
+    void parse_enterprise_snapshot() {
+        ServerAdapterMetaData metaData = ServerAdapterMetaData.parse("server-5.21.0-SNAPSHOT");
+        assertThat(metaData).isNotNull();
+        assertThat(metaData.getRuntimeType()).isEqualTo(RuntimeType.SERVER);
+        assertThat(metaData.getPayaraVersion()).isEqualTo("5.21.0-SNAPSHOT");
+        assertThat(metaData.getJdkRuntime()).isEqualTo(JDKRuntime.JDK8);
+        assertThat(metaData.isPayaraEnterpriseReleasedVersion()).isFalse();
+    }
 }
