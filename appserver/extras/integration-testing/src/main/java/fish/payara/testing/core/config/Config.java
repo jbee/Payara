@@ -40,6 +40,7 @@
 package fish.payara.testing.core.config;
 
 import fish.payara.testing.core.server.JDKRuntime;
+import fish.payara.testing.core.server.PayaraServerVariant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,10 @@ public final class Config {
 
     public static JDKRuntime getJDKRuntime() {
         return JDKRuntime.parse(System.getProperty("payara.test.container.jdk", Defaults.JDK_RUNTIME));
+    }
+
+    public static PayaraServerVariant getPayaraServerVariant() {
+        return PayaraServerVariant.parse(System.getProperty("payara.test.container.variant", "full"));
     }
 
     /**

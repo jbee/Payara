@@ -41,6 +41,7 @@ package fish.payara.testing.core.images;
 
 import fish.payara.testing.core.exception.UnexpectedException;
 import fish.payara.testing.core.server.ServerAdapterMetaData;
+import fish.payara.testing.core.util.DockerImageProcessor;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.IOException;
@@ -86,10 +87,10 @@ public class LoggableImageFromDockerFile extends ImageFromDockerfile {
     private void defineBaseImage(Path dockerfile) {
         if (metaData != null) {
             // We can determine base image from metadata, no need to parse DockerFile
-            baseImage = String.format("%s - %s - %s", metaData.getRuntimeType().name(), metaData.getPayaraVersion(), metaData.getJdkRuntime().name());
+            baseImage = String.format("%s - %s - %s", getName(), metaData.getPayaraVersion(), metaData.getJdkRuntime().name());
             return;
         }
-        // Parsing DockerFile to
+        // Parsing DockerFile too
         try {
             List<String> lines = Files.readAllLines(dockerfile, StandardCharsets.UTF_8);
             // TODO This doesn't work for multi stage build files in Custom type.
@@ -99,6 +100,24 @@ public class LoggableImageFromDockerFile extends ImageFromDockerfile {
         } catch (IOException e) {
             throw new UnexpectedException("IOException during reading of the dockerFile", e);
         }
+    }
+
+
+    private String getName() {
+        String result;
+        switch (metaData.getRuntimeType()) {
+
+            case SERVER:
+                result = DockerImageProcessor.getDockerServerVariantName();
+                break;
+            case MICRO:
+            case CUSTOM:
+                result = metaData.getRuntimeType().name();
+                break;
+            default:
+                throw new IllegalArgumentException("Value " + metaData.getRuntimeType() + " not supported");
+        }
+        return result;
     }
 
 

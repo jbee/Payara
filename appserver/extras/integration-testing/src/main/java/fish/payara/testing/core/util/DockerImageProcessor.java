@@ -39,6 +39,7 @@
  */
 package fish.payara.testing.core.util;
 
+import fish.payara.testing.core.config.Config;
 import fish.payara.testing.core.exception.DockerFileNotFound;
 import fish.payara.testing.core.exception.UnexpectedException;
 import fish.payara.testing.core.images.LoggableImageFromDockerFile;
@@ -59,9 +60,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class DockerImageProcessor {
+
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("payara/(.*):(.*)");
 
     private DockerImageProcessor() {
     }
@@ -151,7 +156,8 @@ public final class DockerImageProcessor {
         switch (metaData.getRuntimeType()) {
 
             case SERVER:
-                result.append("FROM payara/server-full:").append(metaData.getPayaraVersion()).append(version).append("\n");
+                String dockerServerVariant = getDockerServerVariantName();
+                result.append("FROM payara/").append(dockerServerVariant).append(":").append(metaData.getPayaraVersion()).append(version).append("\n");
                 break;
             case MICRO:
                 result.append("FROM payara/micro:").append(metaData.getPayaraVersion()).append(version).append("\n");
@@ -174,7 +180,7 @@ public final class DockerImageProcessor {
                     result.append("\n");  // Make sure the ADD test.war ... is placed on a new line
 
                 } catch (IOException e) {
-                    throw new UnexpectedException("IOexception during file read of 'src/docker/custom/payara.docker' ", e);
+                    throw new UnexpectedException("IOException during file read of 'src/docker/custom/payara.docker' ", e);
                 }
 
                 break;
@@ -187,6 +193,24 @@ public final class DockerImageProcessor {
             result.append("ADD test.war /opt/payara/deployments\n");
         }
         return result.toString();
+    }
+
+    public static String getDockerServerVariantName() {
+        String result;
+        switch (Config.getPayaraServerVariant()) {
+            case FULL:
+                result = "server-full";
+                break;
+            case WEB:
+                result = "server-web";
+                break;
+            case ML:
+                result = "server-ml";  // TODO We don't have this yet. Future extension
+                break;
+            default:
+                throw new IllegalArgumentException("Value " + Config.getPayaraServerVariant() + " not supported");
+        }
+        return result;
     }
 
     // TODO Move this logic out of this class so that it can be tested.
@@ -206,14 +230,17 @@ public final class DockerImageProcessor {
 
     private static String updateVersion(String fromLine, ServerAdapterMetaData metaData) {
         String[] parts = fromLine.split(" ");
+        Matcher matcher = IMAGE_PATTERN.matcher(parts[1]);
 
-        if (!parts[1].startsWith("payara/")) {
+        if (!matcher.matches()) {
             // Only perform the update of the Docker image tag when it is a payara official image.
             return fromLine;
         }
-        int idx = parts[1].indexOf(':');
+
         StringBuilder newImage = new StringBuilder();
-        newImage.append(parts[1], 0, idx+1);  // +1 so that : is included
+        newImage.append("payara/");
+        newImage.append(getDockerServerVariantName());  // server-full, server-web etc
+        newImage.append(':');
         newImage.append(metaData.getPayaraVersion());
         if (metaData.getJdkRuntime() == JDKRuntime.JDK11) {
             newImage.append("-jdk11");

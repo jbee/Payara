@@ -70,6 +70,12 @@ When your reproducer only needs to run on 1 runtime (Server, Micro, or your cust
 
 The allowed values for the _value_ member of `@PayaraContainerTest` are `server`, `micro`, and `custom` (case insensitive).  When the value is not recognized, the value `custom` is used.
 
+When the value `server` is specified, by default it will use the Full profile version (_server-full_). However, with the system property `-Dpayara.test.container.variant` one can define which variant is used.
+
+- full -> server-full (Full Profile)
+- web -> server-web (Web Profile)
+- ml -> server-ml (ML version, does not work et as there are no Docker Images created)
+
 ### Multiple runtimes
 
 A certain test method can also be run on multiple runtimes (sequentially). Use the following structure for that case
@@ -108,6 +114,14 @@ The `-SNAPSHOT` and `-RC` in a version has specific meaning where the `-` is not
 So `server-5.202-SNAPSHOT-jdk11` is parsed as Runtime type `server`, version `5.202-SNAPSHOT`, and JDK `jdk11`.
 
 The version is ignored when using a `custom` image. See [Custom container](#custom_container)
+
+NOTE: you always need to use the value `server` to indicate a Payara Server instance. With the system property `-Dpayara.test.container.variant` one can define which _variant_.
+
+The allowed values, case insensitive, for the system property.
+ 
+- full -> server-full (Full Profile). The default if no value is specified.
+- web -> server-web (Web Profile)
+- ml -> server-ml (ML version, does not work et as there are no Docker Images created)
 
 ### JDK Version of Image
 
@@ -191,7 +205,7 @@ This type of container needs to be specified on the test annotation on the class
 
 In this scenario, it looks for a file called `src/docker/custom/payara.docker` and this file will be used as Docker build file. Also, the entire directory and subdirectories will be passed on to the Docker Daemon for building the image.
 
-In order to now always have to update this custom docker build file when a now official Payara image is released, the version is updated automatically.
+In order to now always have to update this custom docker build file when a new official Payara image is released, the _variant_ and version is updated automatically.
 
 Suppose you have the following contents in `src/docker/custom/payara.docker`
 
@@ -199,6 +213,7 @@ Suppose you have the following contents in `src/docker/custom/payara.docker`
       ADD jaeger-tracer-lib-1.0-jar-with-dependencies.jar /opt/payara/glassfish/domains/production/lib
 
 When the Docker image is built, the code will replace the `:5.194` value to the one defined in the JVM properties `payara.test.container.version` and `payara.test.container.jdk` or the defaults defined in `Config.Defaults`. That way, even the custom-defined Build files will always use the 'correct' versions.
+It also will replace the `server-full` part with `server-web` for example, when the system property `-Dpayara.test.container.variant` has the value _web_.
 
 So to avoid confusion, and prevent CI testing an old version, it is best to define the tag value as
 
