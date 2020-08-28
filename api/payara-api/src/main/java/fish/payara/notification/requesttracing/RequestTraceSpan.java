@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2016-2018 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2020 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package fish.payara.notification.requesttracing;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,9 +220,13 @@ public class RequestTraceSpan implements Serializable, Comparable<RequestTraceSp
         
         result.append("\"startTime\":\"").append(startTime.atZone(ZoneId.systemDefault()).toString())
                 .append("\",");
-        result.append("\"endTime\":\"").append(endTime.atZone(ZoneId.systemDefault()).toString())
-                .append("\",");
-        result.append("\"traceDuration\":\"").append(spanDuration).append("\"");
+        if (endTime != null) {
+            result.append("\"endTime\":\"").append(endTime.atZone(ZoneId.systemDefault()).toString())
+                    .append("\",");
+            result.append("\"traceDuration\":\"").append(spanDuration).append("\"");
+        } else {
+            result.append("\"traceDuration\":\"").append(startTime.until(Instant.now(), ChronoUnit.NANOS)).append("\"");
+        }
         
         if (spanTags != null && !spanTags.isEmpty()) {
             result.append(",\"spanTags\":[");
