@@ -43,11 +43,13 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.Scanner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Tests to run against the server log
  */
+@Ignore
 public class ServerLogTest extends RestManagementTest {
 
     /**
